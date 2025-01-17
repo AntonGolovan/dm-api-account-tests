@@ -1,1 +1,1 @@
-# dm_api_tests
+# dm-api-account-tests
