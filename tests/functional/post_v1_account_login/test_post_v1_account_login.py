@@ -14,7 +14,7 @@ def test_post_v1_account_login():
 
     # Регистрация пользователя
 
-    login = 'golovan82'
+    login = 'golovan86'
     password = '112233'
     email = f'{login}@mail.ru'
 
