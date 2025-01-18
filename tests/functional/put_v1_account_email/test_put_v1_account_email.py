@@ -13,7 +13,7 @@ def test_put_v1_account_email():
 
     # Регистрация пользователя
 
-    login = 'golovan76'
+    login = 'golovan83'
     password = '112233'
     email = f'{login}@mail.ru'
 

@@ -14,7 +14,7 @@ def test_post_v1_account_login():
 
     # Регистрация пользователя
 
-    login = 'golovan75'
+    login = 'golovan82'
     password = '112233'
     email = f'{login}@mail.ru'
 
@@ -49,13 +49,7 @@ def test_post_v1_account_login():
 
     # Активация пользователя
 
-    json_data = {
-        'login': login,
-        'password': password,
-        'rememberMe': True
-    }
-
-    response = login_api.post_v1_account_login(json_data=json_data)
+    response = account_api.put_v1_account_token(token)
 
     print(response.status_code)
     print(response.text)
@@ -64,7 +58,13 @@ def test_post_v1_account_login():
 
     # Авторизация пользователя
 
-    response = account_api.put_v1_account_token(token=token)
+    json_data = {
+        'login': login,
+        'password': password,
+        'rememberMe': True
+    }
+
+    response = login_api.post_v1_account_login(json_data=json_data)
 
     print(response.status_code)
     print(response.text)
