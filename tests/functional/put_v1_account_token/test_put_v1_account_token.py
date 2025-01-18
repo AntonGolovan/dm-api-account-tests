@@ -1,3 +1,5 @@
+import time
+
 from api_mailhog.apis.mailhog_api import MailhogApi
 from dm_api_account.apis.account_api import AccountApi
 from dm_api_account.apis.login_api import LoginApi
@@ -11,7 +13,7 @@ def test_put_v1_account_token():
     mailhog_api = MailhogApi(host='http://5.63.153.31:5025')
 
     # Регистрация пользователя
-    login = 'golovan65'
+    login = 'golovan74'
     password = '112233'
     email = f'{login}@mail.ru'
 
@@ -34,6 +36,7 @@ def test_put_v1_account_token():
     print(response.status_code)
     print(response.text)
     assert response.status_code == 200, 'Письма не были получены'
+    time.sleep(1)
 
     # Получить токен из письма
 
