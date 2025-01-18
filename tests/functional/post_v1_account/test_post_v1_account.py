@@ -13,7 +13,7 @@ def test_post_v1_account():
     login_api = LoginApi(host='http://5.63.153.31:5051')
     mailhog_api = MailhogApi(host='http://5.63.153.31:5025')
 
-    login = 'golovan32'
+    login = 'golovan60'
     password = '112233'
     email = f'{login}@mail.ru'
 
@@ -39,7 +39,7 @@ def test_post_v1_account():
 
 
     # Получить токен из почтового сервиса
-    token = get_activation_token_by_login(login, response)
+    token = get_activation_token_by_login(login=login, response=response)
 
     assert token is not None, f'Токен для пользователя {login} не был получен'
 
@@ -75,7 +75,7 @@ def get_activation_token_by_login(
         try:
             user_data = loads(item['Content']['Body'])
         except (JSONDecodeError, KeyError):
-            continue
+            print('Не верный формат')
         user_login = user_data['Login']
         if user_login == login:
             token = user_data['ConfirmationLinkUrl'].split('/')[-1]

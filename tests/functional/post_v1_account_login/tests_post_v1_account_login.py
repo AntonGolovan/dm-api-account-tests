@@ -12,7 +12,7 @@ def test_post_v1_account_login():
 
     # Регистрация пользователя
 
-    login = 'golovan33'
+    login = 'golovan62'
     password = '112233'
     email = f'{login}@mail.ru'
 
@@ -25,7 +25,7 @@ def test_post_v1_account_login():
     response = account_api.post_v1_account(json_data=json_data)
 
     print(response.status_code)
-    print(response.json())
+    print(response.text)
 
     assert response.status_code == 201, f'Пользователь не создан {response.json()}'
 
@@ -34,7 +34,7 @@ def test_post_v1_account_login():
     response = mailhog_api.get_api_v2_messages()
 
     print(response.status_code)
-    print(response.json())
+    print(response.text)
 
     assert response.status_code == 200, 'Письма не были получены'
 
@@ -55,7 +55,7 @@ def test_post_v1_account_login():
     response = login_api.post_v1_account_login(json_data=json_data)
 
     print(response.status_code)
-    print(response.json())
+    print(response.text)
 
     assert response.status_code == 200, f'Пользователь не был активирован'
 
@@ -64,6 +64,6 @@ def test_post_v1_account_login():
     response = account_api.put_v1_account_token(token=token)
 
     print(response.status_code)
-    print(response.json())
+    print(response.text)
 
     assert response.status_code == 200, f'Пользователь не авторизован'
