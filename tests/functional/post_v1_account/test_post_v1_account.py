@@ -1,4 +1,3 @@
-import pprint
 from json import (
     loads,
     JSONDecodeError,
