@@ -1,7 +1,5 @@
 from json import loads
-
 from requests import JSONDecodeError
-
 from services.api_mailhog import MailHogApi
 from services.dm_api_account import DMApiAccount
 
@@ -67,9 +65,9 @@ class AccountHelper:
         for item in response.json()['items']:
             try:
                 user_data = loads(item['Content']['Body'])
+                user_login = user_data['Login']
             except (JSONDecodeError, KeyError):
                 print('Не верный формат')
-            user_login = user_data['Login']
             if user_login == login:
                 token = user_data['ConfirmationLinkUrl'].split('/')[-1]
         return token
