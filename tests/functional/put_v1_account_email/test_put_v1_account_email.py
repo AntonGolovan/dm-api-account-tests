@@ -73,6 +73,6 @@ def test_put_v1_account_email():
     response = account_helper.dm_account_api.account_api.put_v1_account_token(token)
     assert response.status_code == 200, 'Пользователь не был активирован'
 
-    # Авторизация
+    # Авторизация пользователя
 
     account_helper.user_login(login=login, password=password)
