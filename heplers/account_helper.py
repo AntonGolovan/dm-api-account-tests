@@ -4,7 +4,7 @@ from json import loads
 from requests import JSONDecodeError
 from services.api_mailhog import MailHogApi
 from services.dm_api_account import DMApiAccount
-
+from retrying import retry
 
 def retrier(
         func
@@ -26,6 +26,9 @@ def retrier(
             time.sleep(1)
     return wrapper
 
+def retry_if_result_none(result):
+    """Return True if we should retry (in this case when result is None), False otherwise"""
+    return result is None
 
 
 
@@ -78,7 +81,7 @@ class AccountHelper:
         assert response.status_code == 200, 'Пользователь не был авторизован'
         return response
 
-    @retrier
+    @retry(stop_max_attempt_number=5, retry_on_result=retry_if_result_none, wait_fixed=1000)
     def get_activation_token_by_login(
             self,
             login,
