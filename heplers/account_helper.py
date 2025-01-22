@@ -1,3 +1,4 @@
+import pprint
 from json import loads
 from requests import JSONDecodeError
 from services.api_mailhog import MailHogApi
@@ -65,9 +66,59 @@ class AccountHelper:
         for item in response.json()['items']:
             try:
                 user_data = loads(item['Content']['Body'])
-                user_login = user_data['Login']
             except (JSONDecodeError, KeyError):
-                print('Не верный формат')
+                print("Ошибка декодирования JSON")
+            user_login = user_data['Login']
             if user_login == login:
                 token = user_data['ConfirmationLinkUrl'].split('/')[-1]
+            return token
+
+    def change_email_user(
+            self,
+            login: str,
+            password: str,
+            email: str
+    ):
+        json_data = {
+            'login': login,
+            'password': password,
+            'email': f'ant.{email}',
+        }
+
+        response = self.dm_account_api.account_api.put_v1_account_email(json_data=json_data)
+        assert response.status_code == 200, f'Не успешная попытка изменить email {response.json()}'
+        return response
+
+    def verify_login_failure_for_email_change(
+            self,
+            login,
+            password,
+            rememberMe = True
+    ):
+        json_data = {
+            'login': login,
+            'password': password,
+            'rememberMe': rememberMe,
+        }
+
+        response = self.dm_account_api.login_api.post_v1_account_login(json_data=json_data)
+        assert response.status_code == 403, f'Пользователь не авторизован {response.json()}'
+        return response
+
+    def fetch_activation_token(
+            self,
+            login
+    ):
+        response = self.mailhog.mailhog_api.get_api_v2_messages()
+        assert response.status_code == 200, 'Письма не были получены'
+
+        token = self.get_activation_token_by_login(login=login, response=response)
+        assert token is not None, f'Токен для пользователя {login} не был получен'
         return token
+
+    def activate_user(
+            self,
+            token
+    ):
+        response = self.dm_account_api.account_api.put_v1_account_token(token=token)
+        assert response.status_code == 200, 'Пользователь не был активирован'

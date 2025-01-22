@@ -25,7 +25,7 @@ def test_put_v1_account_email():
 
     account_helper = AccountHelper(dm_account_api=account, mailhog=mailhog)
 
-    login = 'golovan113'
+    login = 'golovan151'
     password = '112233'
     email = f'{login}@mail.ru'
 
@@ -38,40 +38,19 @@ def test_put_v1_account_email():
 
     # Смена email пользователя
 
-    json_data = {
-        'login': login,
-        'password': password,
-        'email': f'ant{login}@mail.ru',
-    }
-
-    response = account_helper.dm_account_api.account_api.put_v1_account_email(json_data=json_data)
-    assert response.status_code == 200, f'Не успешная попытка изменить email {response.json()}'
+    account_helper.change_email_user(login=login, password=password, email=email)
 
     # Авторизация пользователя после смены адреса почты
 
-    json_data = {
-        'login': login,
-        'password': password,
-        'rememberMe': True,
-    }
+    account_helper.verify_login_failure_for_email_change(login=login, password=password)
 
-    response = account_helper.dm_account_api.login_api.post_v1_account_login(json_data=json_data)
-    assert response.status_code == 403, f'Пользователь не авторизован {response.json()}'
+    # Получение нового токена активации из письма в почтовом сервисе
 
-    # Получение письма из почтового сервиса
-
-    response = account_helper.mailhog.mailhog_api.get_api_v2_messages()
-    assert response.status_code == 200, 'Письма не были получены'
-
-    # Получение нового токена активации
-
-    token = account_helper.get_activation_token_by_login(login=login, response=response)
-    assert token is not None, f'Токен для пользователя {login} не был получен'
+    token = account_helper.fetch_activation_token(login=login)
 
     # Активация пользователя по новому токену
 
-    response = account_helper.dm_account_api.account_api.put_v1_account_token(token)
-    assert response.status_code == 200, 'Пользователь не был активирован'
+    account_helper.activate_user(token=token)
 
     # Авторизация пользователя
 
