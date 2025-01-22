@@ -137,7 +137,7 @@ class AccountHelper:
         response = self.mailhog.mailhog_api.get_api_v2_messages()
         assert response.status_code == 200, 'Письма не были получены'
 
-        token = self.get_activation_token_by_login(login=login, response=response)
+        token = self.get_activation_token_by_login(login=login)
         assert token is not None, f'Токен для пользователя {login} не был получен'
         return token
 
