@@ -1,3 +1,4 @@
+
 from heplers.account_helper import AccountHelper
 from restclient.configuration import Configuration as MailhogConfiguration
 from restclient.configuration import Configuration as DmApiConfiguration
@@ -16,13 +17,16 @@ structlog.configure(
 )
 
 def test_post_v1_account_login():
+
     dm_api_configuration = DmApiConfiguration(host='http://5.63.153.31:5051', disable_log=False)
     mailhog_configuration = MailhogConfiguration(host='http://5.63.153.31:5025')
 
     account = DMApiAccount(configuration=dm_api_configuration)
     mailhog = MailHogApi(configuration=mailhog_configuration)
 
+
     account_helper = AccountHelper(dm_account_api=account, mailhog=mailhog)
+
 
     login = 'golovan179'
     password = '112233'
