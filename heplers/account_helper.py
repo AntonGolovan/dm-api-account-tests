@@ -42,6 +42,18 @@ class AccountHelper:
         self.dm_account_api = dm_account_api
         self.mailhog = mailhog
 
+    def auth_client(self, login: str, password: str):
+        responce = self.dm_account_api.login_api.post_v1_account_login(
+            json_data={
+                'login': login,
+                'password': password
+            }
+        )
+        token = {'x-dm-auth-token': responce.headers['x-dm-auth-token']}
+        self.dm_account_api.account_api.set_headers(token)
+        self.dm_account_api.login_api.set_headers(token)
+
+
     def register_new_user(
             self,
             login: str,
@@ -114,21 +126,6 @@ class AccountHelper:
         assert response.status_code == 200, f'Не успешная попытка изменить email {response.json()}'
         return response
 
-    def verify_login_failure_for_email_change(
-            self,
-            login,
-            password,
-            rememberMe = True
-    ):
-        json_data = {
-            'login': login,
-            'password': password,
-            'rememberMe': rememberMe,
-        }
-
-        response = self.dm_account_api.login_api.post_v1_account_login(json_data=json_data)
-        assert response.status_code == 403, f'Пользователь не авторизован {response.json()}'
-        return response
 
     def fetch_activation_token(
             self,
