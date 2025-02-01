@@ -122,6 +122,9 @@ class AccountHelper:
     def user_logout(self):
         self.dm_account_api.account_api.delete_v1_account_login()
 
+    def user_logout_every_device(self):
+        self.dm_account_api.account_api.delete_v1_account_login_all()
+
 
     @retry(stop_max_attempt_number=5, retry_on_result=retry_if_result_none, wait_fixed=1000)
     def get_activation_token_by_login(
