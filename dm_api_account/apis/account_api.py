@@ -96,3 +96,14 @@ class AccountApi(RestClient):
             json=json_data
         )
         return response
+
+    def delete_v1_account_login(
+            self
+    ):
+        """
+        Logout as current user
+        :return:
+        """
+        self.delete(
+            path=f'/v1/account/login',
+        )
