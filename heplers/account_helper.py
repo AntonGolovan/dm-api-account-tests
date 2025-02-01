@@ -1,4 +1,3 @@
-import pprint
 import time
 from json import loads
 from requests import JSONDecodeError
@@ -6,13 +5,8 @@ from services.api_mailhog import MailHogApi
 from services.dm_api_account import DMApiAccount
 from retrying import retry
 
-def retrier(
-        func
-):
-    def wrapper(
-            *args,
-            **kwargs
-    ):
+def retrier(func):
+    def wrapper(*args,**kwargs):
         token = None
         count = 0
         while token is None:
@@ -42,16 +36,48 @@ class AccountHelper:
         self.dm_account_api = dm_account_api
         self.mailhog = mailhog
 
-    def auth_client(self, login: str, password: str):
-        responce = self.dm_account_api.login_api.post_v1_account_login(
-            json_data={
+
+    def auth_client(
+            self,
+            login: str,
+            password: str
+    ):
+        responce = self.user_login(login=login, password=password)
+        auth_token = {'x-dm-auth-token': responce.headers['x-dm-auth-token']}
+        self.dm_account_api.account_api.set_headers(auth_token)
+        self.dm_account_api.login_api.set_headers(auth_token)
+
+
+    def change_password(
+            self,
+            login: str,
+            email: str,
+            oldPassword: str,
+            newPassword: str
+    ):
+        self.reset_user_password(login=login, email=email)
+        token = self.fetch_activation_token(login=login)
+        self.dm_account_api.account_api.put_v1_account_password(
+            json={
                 'login': login,
-                'password': password
+                'token': token,
+                'oldPassword': oldPassword,
+                'newPassword': newPassword,
             }
         )
-        token = {'x-dm-auth-token': responce.headers['x-dm-auth-token']}
-        self.dm_account_api.account_api.set_headers(token)
-        self.dm_account_api.login_api.set_headers(token)
+        self.user_login(login=login, password=newPassword)
+
+    def reset_user_password(
+            self,
+            login: str,
+            email: str
+    ):
+        self.dm_account_api.account_api.post_v1_account_password(
+            json={
+                'login': login,
+                'email': email
+            }
+        )
 
 
     def register_new_user(
@@ -106,8 +132,10 @@ class AccountHelper:
             except (JSONDecodeError, KeyError):
                 print("Ошибка декодирования JSON")
             user_login = user_data['Login']
-            if user_login == login:
+            if user_login == login and user_data.get('ConfirmationLinkUrl'):
                 token = user_data['ConfirmationLinkUrl'].split('/')[-1]
+            else:
+                token = user_data['ConfirmationLinkUri'].split('/')[-1]
             return token
 
     def change_email_user(
@@ -131,9 +159,6 @@ class AccountHelper:
             self,
             login
     ):
-        response = self.mailhog.mailhog_api.get_api_v2_messages()
-        assert response.status_code == 200, 'Письма не были получены'
-
         token = self.get_activation_token_by_login(login=login)
         assert token is not None, f'Токен для пользователя {login} не был получен'
         return token
