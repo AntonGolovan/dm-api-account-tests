@@ -79,7 +79,6 @@ class AccountHelper:
             login: str,
             email: str
     ):
-
         reset_password = ResetPassword(
             login=login,
             email=email
