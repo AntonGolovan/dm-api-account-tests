@@ -1,6 +1,12 @@
 import time
 from json import loads
 from requests import JSONDecodeError
+
+from dm_api_account.models.change_email import ChangeEmail
+from dm_api_account.models.change_password import ChangePassword
+from dm_api_account.models.login_credentials import LoginCredentials
+from dm_api_account.models.registration import Registration
+from dm_api_account.models.reset_password import ResetPassword
 from services.api_mailhog import MailHogApi
 from services.dm_api_account import DMApiAccount
 from retrying import retry
@@ -52,32 +58,32 @@ class AccountHelper:
             self,
             login: str,
             email: str,
-            oldPassword: str,
-            newPassword: str
+            old_password: str,
+            new_password: str
     ):
         self.reset_user_password(login=login, email=email)
         token = self.fetch_activation_token(login=login)
-        self.dm_account_api.account_api.put_v1_account_password(
-            json={
-                'login': login,
-                'token': token,
-                'oldPassword': oldPassword,
-                'newPassword': newPassword,
-            }
+
+        change_password = ChangePassword(
+            login=login,
+            token=token,
+            oldPassword=old_password,
+            newPassword=new_password
         )
-        self.user_login(login=login, password=newPassword)
+        self.dm_account_api.account_api.put_v1_account_password(change_password)
+        return new_password
+
 
     def reset_user_password(
             self,
             login: str,
             email: str
     ):
-        self.dm_account_api.account_api.post_v1_account_password(
-            json={
-                'login': login,
-                'email': email
-            }
+        reset_password = ResetPassword(
+            login=login,
+            email=email
         )
+        self.dm_account_api.account_api.post_v1_account_password(reset_password)
 
 
     def register_new_user(
@@ -86,40 +92,37 @@ class AccountHelper:
             password: str,
             email: str
     ):
-        json_data = {
-            'login': login,
-            'email': email,
-            'password': password,
-        }
-
-        response = self.dm_account_api.account_api.post_v1_account(json_data=json_data)
+        registration = Registration(
+            login=login,
+            password=password,
+            email=email
+        )
+        response = self.dm_account_api.account_api.post_v1_account(registration=registration)
         assert response.status_code == 201, f'Пользователь не создан {response.json()}'
         start_time = time.time()
         token = self.get_activation_token_by_login(login=login)
         end_time = time.time()
         assert end_time - start_time < 3, "Время ожидания активации превышено"
         assert token is not None, f'Токен для пользователя {login} не был получен'
-
-        response = self.dm_account_api.account_api.put_v1_account_token(token=token)
-        assert response.status_code == 200, 'Пользователь не был активирован'
-
+        response = self.dm_account_api.account_api.put_v1_account_token(token=token, validate_response=False)
         return response
 
     def user_login(
             self,
             login: str,
             password: str,
-            remember_me: bool = True
+            remember_me: bool = True,
+            validate_response=False
     ):
-        json_data = {
-            'login': login,
-            'password': password,
-            'rememberMe': remember_me,
-        }
-
-        response = self.dm_account_api.login_api.post_v1_account_login(json_data=json_data)
-        assert response.headers['x-dm-auth-token'], 'Токен авторизации не был получен'
-        assert response.status_code == 200, 'Пользователь не был авторизован'
+        login_credentials = LoginCredentials(
+            login=login,
+            password=password,
+            remember_me=remember_me
+        )
+        response = self.dm_account_api.login_api.post_v1_account_login(
+            login_credentials=login_credentials,
+            validate_response=validate_response
+        )
         return response
 
     def user_logout(self):
@@ -154,13 +157,12 @@ class AccountHelper:
             password: str,
             email: str
     ):
-        json_data = {
-            'login': login,
-            'password': password,
-            'email': f'ant.{email}',
-        }
-
-        response = self.dm_account_api.account_api.put_v1_account_email(json_data=json_data)
+        change_email = ChangeEmail(
+            login=login,
+            password=password,
+            email=email
+        )
+        response = self.dm_account_api.account_api.put_v1_account_email(change_email)
         assert response.status_code == 200, f'Не успешная попытка изменить email {response.json()}'
         return response
 
@@ -175,7 +177,8 @@ class AccountHelper:
 
     def activate_user(
             self,
-            token
+            token,
+            validate_response
     ):
-        response = self.dm_account_api.account_api.put_v1_account_token(token=token)
+        response = self.dm_account_api.account_api.put_v1_account_token(token=token, validate_response=validate_response)
         assert response.status_code == 200, 'Пользователь не был активирован'
