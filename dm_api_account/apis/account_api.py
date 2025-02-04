@@ -1,5 +1,3 @@
-import requests
-
 from restclient.client import RestClient
 
 
@@ -17,6 +15,52 @@ class AccountApi(RestClient):
         response = self.post(
             path=f'/v1/account',
             json=json_data
+        )
+        return response
+
+    def post_v1_account_password(
+            self,
+            **kwargs
+    ):
+        """
+        Reset registered user password
+        :param json:
+        :return:
+        """
+        responce = self.post(
+            path=f'/v1/account/password',
+            **kwargs
+        )
+        return responce
+
+    def put_v1_account_password(
+            self,
+            **kwargs
+    ):
+        """
+        Change registered user password
+        :param:
+        :return:
+        """
+        responce = self.put(
+            path=f'/v1/account/password',
+            **kwargs
+        )
+        return responce
+
+
+    def get_v1_account(
+            self,
+            **kwargs
+    ):
+        """
+        Get current user
+        :param kwargs:
+        :return:
+        """
+        response = self.get(
+            path=f'/v1/account',
+            **kwargs
         )
         return response
 
@@ -52,3 +96,30 @@ class AccountApi(RestClient):
             json=json_data
         )
         return response
+
+    def delete_v1_account_login(
+            self,
+            **kwargs
+    ):
+        """
+        Logout as current user
+        :return:
+        """
+        self.delete(
+            path=f'/v1/account/login',
+            **kwargs
+        )
+
+
+    def delete_v1_account_login_all(
+            self,
+            **kwargs
+    ):
+        """
+        Logout from every device
+        :return:
+        """
+        self.delete(
+            path=f'/v1/account/login/all',
+            **kwargs
+        )
