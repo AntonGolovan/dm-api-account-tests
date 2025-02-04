@@ -1,7 +1,6 @@
 import time
 from json import loads
 from requests import JSONDecodeError
-
 from dm_api_account.models.change_email import ChangeEmail
 from dm_api_account.models.change_password import ChangePassword
 from dm_api_account.models.login_credentials import LoginCredentials
