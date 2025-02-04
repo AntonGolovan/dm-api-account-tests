@@ -72,6 +72,52 @@ class AccountApi(RestClient):
            return UserDetailsEnvelope(**response.json())
         return response
 
+    def post_v1_account_password(
+            self,
+            **kwargs
+    ):
+        """
+        Reset registered user password
+        :param json:
+        :return:
+        """
+        responce = self.post(
+            path=f'/v1/account/password',
+            **kwargs
+        )
+        return responce
+
+    def put_v1_account_password(
+            self,
+            **kwargs
+    ):
+        """
+        Change registered user password
+        :param:
+        :return:
+        """
+        responce = self.put(
+            path=f'/v1/account/password',
+            **kwargs
+        )
+        return responce
+
+
+    def get_v1_account(
+            self,
+            **kwargs
+    ):
+        """
+        Get current user
+        :param kwargs:
+        :return:
+        """
+        response = self.get(
+            path=f'/v1/account',
+            **kwargs
+        )
+        return response
+
     def put_v1_account_token(
             self,
             token,

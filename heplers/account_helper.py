@@ -42,6 +42,7 @@ class AccountHelper:
         self.mailhog = mailhog
 
 
+
     def auth_client(
             self,
             login: str,
@@ -78,12 +79,14 @@ class AccountHelper:
             login: str,
             email: str
     ):
+
         reset_password = ResetPassword(
             login=login,
             email=email
         )
         self.dm_account_api.account_api.post_v1_account_password(reset_password)
 
+    
 
     def register_new_user(
             self,
@@ -106,6 +109,7 @@ class AccountHelper:
         response = self.dm_account_api.account_api.put_v1_account_token(token=token, validate_response=False)
         return response
 
+
     def user_login(
             self,
             login: str,
@@ -123,6 +127,7 @@ class AccountHelper:
             validate_response=validate_response
         )
         return response
+
 
     def user_logout(self):
         self.dm_account_api.account_api.delete_v1_account_login()
@@ -150,6 +155,7 @@ class AccountHelper:
                 token = user_data['ConfirmationLinkUri'].split('/')[-1]
             return token
 
+
     def change_email_user(
             self,
             login: str,
@@ -173,6 +179,7 @@ class AccountHelper:
         token = self.get_activation_token_by_login(login=login)
         assert token is not None, f'Токен для пользователя {login} не был получен'
         return token
+
 
     def activate_user(
             self,
