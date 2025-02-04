@@ -1,7 +1,6 @@
 import time
 from json import loads
 from requests import JSONDecodeError
-
 from dm_api_account.models.change_email import ChangeEmail
 from dm_api_account.models.change_password import ChangePassword
 from dm_api_account.models.login_credentials import LoginCredentials
@@ -80,6 +79,7 @@ class AccountHelper:
             login: str,
             email: str
     ):
+
         reset_password = ResetPassword(
             login=login,
             email=email
@@ -87,6 +87,7 @@ class AccountHelper:
         self.dm_account_api.account_api.post_v1_account_password(reset_password)
 
     
+
     def register_new_user(
             self,
             login: str,
