@@ -1,8 +1,6 @@
 from datetime import datetime
 from collections import namedtuple
-
 import pytest
-
 from heplers.account_helper import AccountHelper
 from restclient.configuration import Configuration as MailhogConfiguration
 from restclient.configuration import Configuration as DmApiConfiguration
